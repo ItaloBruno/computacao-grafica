@@ -1,36 +1,37 @@
 from PIL import Image
 
 # Abre as imagens de brackground, alpha_channel e foreground
-imagem1 = Image.open("background.jpg")
-imagem2 = Image.open("alpha_channel.png")
-iamgem3 = Image.open("foreground.png")
+imagem_de_fundo = Image.open("background.jpg")
+imagem_canal_alfa = Image.open("alpha_channel.png")
+imagem_primeiro_plano = Image.open("foreground.png")
 
 # Carrega as imagens nas variáveis para fazer as manipulação necessárias
-background = imagem1.load()
-alpha_channel = imagem2.load()
-foreground = iamgem3.load()
+fundo = imagem_de_fundo.load()
+canal_alfa = imagem_canal_alfa.load()
+primeiro_plano = imagem_primeiro_plano.load()
 
 # Tamanho X e Y das imagens, para percorrer cada pixel
-tamX = imagem1.size[0]
-tamY = imagem1.size[1]
+tam_eixo_x = imagem_de_fundo.size[0]
+tam_exio_y = imagem_de_fundo.size[1]
+
+# Definindo o Alfa que iremos usar na aplicação do canal afa
+alfa = 0.5
 
 # Percorrendo cada pixel e aplicando a fórmula 
-for i in range(0,tamX,1):
-    for j in range(0,tamY,1):
-        
-        red = int(alpha_channel[i,j][0]/255) * foreground[i,j][0]
-        green = int(alpha_channel[i,j][1]/255) * foreground[i,j][1]
-        blue = int(alpha_channel[i,j][2]/255) * foreground[i,j][2]
+for x in range(tam_eixo_x):
+    for y in range(tam_exio_y):
+        if(canal_alfa[x, y][0] == 255):
+            vermelho = int(canal_alfa[x,y][0]/255) * primeiro_plano[x,y][0]
+            verde = int(canal_alfa[x,y][1]/255) * primeiro_plano[x,y][1]
+            azul = int(canal_alfa[x,y][2]/255) * primeiro_plano[x,y][2]
 
-        foreground[i,j] = (red,green,blue)
+            primeiro_plano[x,y] = (vermelho,verde,azul)
 
-        alpha = 0.5
+            vermelho_2 = int((alfa * primeiro_plano[x,y][0]) + ((1-alfa) * fundo[x,y][0]))
+            verde_2 = int((alfa * primeiro_plano[x,y][1]) + ((1-alfa) * fundo[x,y][1]))
+            azul_2 = int((alfa * primeiro_plano[x,y][2]) + ((1-alfa) * fundo[x,y][2]))
 
-        red2 = int((alpha * foreground[i,j][0]) + ((1-alpha) * background[i,j][0]))
-        green2 = int((alpha * foreground[i,j][1]) + ((1-alpha) * background[i,j][1]))
-        blue2 = int((alpha * foreground[i,j][2]) + ((1-alpha) * background[i,j][2]))
+            fundo[x,y] = (vermelho_2,verde_2,azul_2)
 
-        background[i,j] = (red2,green2,blue2)
-
-# Mostra a imagem resultante do algoritmo de aplicação do canal alpha
-imagem1.show()
+# Mostra a imagem resultante do algoritmo de aplicação do canal alfa
+imagem_de_fundo.show()
