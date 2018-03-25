@@ -14,16 +14,17 @@ foreground = iamgem3.load()
 tamX = imagem1.size[0]
 tamY = imagem1.size[1]
 
+# Percorrendo cada pixel e aplicando a fórmula 
 for i in range(0,tamX,1):
     for j in range(0,tamY,1):
-
+        
         red = int(alpha_channel[i,j][0]/255) * foreground[i,j][0]
         green = int(alpha_channel[i,j][1]/255) * foreground[i,j][1]
         blue = int(alpha_channel[i,j][2]/255) * foreground[i,j][2]
 
         foreground[i,j] = (red,green,blue)
 
-        alpha = 0.8
+        alpha = 0.5
 
         red2 = int((alpha * foreground[i,j][0]) + ((1-alpha) * background[i,j][0]))
         green2 = int((alpha * foreground[i,j][1]) + ((1-alpha) * background[i,j][1]))
@@ -31,7 +32,5 @@ for i in range(0,tamX,1):
 
         background[i,j] = (red2,green2,blue2)
 
-#dart.show()
+# Mostra a imagem resultante do algoritmo de aplicação do canal alpha
 imagem1.show()
-#imagem2.show()
-#imagem1.show()
