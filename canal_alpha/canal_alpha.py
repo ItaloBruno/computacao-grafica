@@ -12,14 +12,14 @@ primeiro_plano = imagem_primeiro_plano.load()
 
 # Tamanho X e Y das imagens, para percorrer cada pixel
 tam_eixo_x = imagem_de_fundo.size[0]
-tam_exio_y = imagem_de_fundo.size[1]
+tam_eixo_y = imagem_de_fundo.size[1]
 
-# Definindo o Alfa que iremos usar na aplicação do canal afa
+# Definindo o alfa que iremos usar
 alfa = 0.5
 
-# Percorrendo cada pixel e aplicando a fórmula 
+# Percorrendo cada pixel e aplicando a fórmula
 for x in range(tam_eixo_x):
-    for y in range(tam_exio_y):
+    for y in range(tam_eixo_y):
         if(canal_alfa[x, y][0] == 255):
             vermelho = int(canal_alfa[x,y][0]/255) * primeiro_plano[x,y][0]
             verde = int(canal_alfa[x,y][1]/255) * primeiro_plano[x,y][1]
