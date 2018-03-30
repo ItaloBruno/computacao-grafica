@@ -1,82 +1,98 @@
 import numpy
-import copy
 from math import pow, sqrt
+#import copy
 
 # Parâmetros disponibilizados
 left   = -10
-right  = 10
-top    = 5
+right  =  10
+top    =  5
 bottom = -5
 
 # Declaração de vetores que serão usados
-vetor_e = [2, -2, 3]
-vetor_w = [0, 0, 0]
-vetor_t = [0, 0, 0]
+vetorE = [2, -2, 3]
 
-vetor_v = [0, 0, 0]
-vetor_u = [0, 0, 0]
+vetorW = [0, 0, 0]
+vetorT = [0, 0, 0]
+vetorV = [0, 0, 0]
+vetorU = [0, 0, 0]
 
-matrix_1 = []
-matrix_2 = []
+# Dimensões da imagem
+numColunas = 640
+numlinhas  = 480
 
-# Calculo da norma/módulo do vetor_e
-norma = (pow(vetor_e[0], 2) + pow(vetor_e[1], 2) + pow(vetor_e[2], 2))
-norma = sqrt(norma)
+# ================================ Funções ================================
+def criaMatriz(numlinhas, numColunas, valor):
+    matriz = [] 
+    for x in range(numColunas):
+        linha = []
+        for y in range(numlinhas):
+	        linha += [valor]
+        matriz += [linha]
+    return matriz
 
-# Calculando o vetor unitário do vetor_e e atribuindo o valor para cada elemento do vetor_w
-for i in range(len(vetor_e)):
-    vetor_w[i] = vetor_e[i]/norma
+def normaVetor(vetor):
+    norma = pow(vetor[0], 2) + pow(vetor[1], 2) + pow(vetor[2], 2)
+    norma = sqrt(norma)
+    return norma
 
-# O vetor_t terá os mesmos valores do vetor_w, com a diferença que o menor elemento (valor absoluto) de t será setado para 1
-vetor_t = vetor_w[:]
-indice_t = 0
-t_minimo = 0
+def vetorUnitario(vetor, norma):
+    vetorAux = vetor[:]
+    for i in range (len(vetorAux)):
+        vetorAux[i] = vetorAux[i]/norma
+    return vetorAux
 
-for indice, valor in enumerate(vetor_t):
-    if (t_minimo > abs(valor)): 
-        indice_t = indice
-        
-vetor_t[indice_t] = 1
+def calculoVetorT(vetor):
+    vetorAux  = vetor[:]
+    indiceMin = 0
+    for indice, valor in enumerate(vetor):
+        if(0 > abs(valor)):
+            indiceMin = indice
+    vetorAux[indiceMin] = 1
+    return vetorAux
 
-#====================================================================================================================
-# u2 = numpy.cross(vetor_t, vetor_w)
+def produtoEscalar(vetor, escalar):
+    vetorAux = vetor[:]
+    for i in range(len(vetorAux)):
+        vetorAux[i] = vetorAux[i] * escalar
+    return vetorAux
 
-# norma2 = ((u2[0]**2) + ((u2[1]**2)) + (u2[2]**2))**(1/2)
+def calculaValoresUV(matrizImagem, numColunas, numlinhas, left, right, top, bottom):
+    for i in range(numColunas):
+        for j in range(numlinhas):
+            u = float((left + (right -left) * (i + 0.5))) / numColunas
+            v = float((bottom + (top - bottom) * (j + 0.5))) / numlinhas
+            matrizImagem[i, j] = (u, v)
 
-# vetor_u = numpy.cross(vetor_t,vetor_w) /norma2
+def casoOrtografico(vetorE, vetorU, vetorV, vetorW):
+    u = -1
+    v = -1
+    direcao  = produtoEscalar(vetorW, -1)
+    escalar1 = produtoEscalar(vetorU, u)
+    escalar2 = produtoEscalar(vetorV, v)
+    origem   = vetorE + escalar1 + escalar2
 
-# v = numpy.cross(vetor_u,vetor_w)
+#===========================================================================
 
+# # Inicia todos os elementos da matriz imagem com valor 0
+# matrizImagem = criaMatriz(numlinhas, numColunas, 0)
 
-# j = 0
-# for j in range(0,640,1):
-#     for i in range(0,480,1):
-#         matrix_1.append(0)
-#     matrix_2.append(matrix_1)
-#     matrix_1 = []
+# Calculo do vetor W, que será o vetor unitário do vetor E
+normaVetorE = normaVetor(vetorE)
+vetorW = vetorUnitario(vetorE, normaVetorE)
 
-# ##while(j<480):
-# ##    i=0
-# ##    linha = []
-# ##    while(i<640):
-# ##        linha[i].append(0)
-# ##        i+=1
-# ##    Tamx.append(linha)
-# ##    j+=
+# O vetor T terá os mesmos valores do vetor W, 
+# com a diferença que o menor elemento (valor absoluto) de T será setado para 1
+vetorT = calculoVetorT(vetorW)
 
-# print(vetor_w)
-# print(vetor_t)
-# print(vetor_u)
-# print(v)
-# #print(Matrix2[0])
-# i = 0
-# j = 0
-# print(matrix_2[0][200])
-# for j in range(0,640,1):
-#     for i in range(0,480,1):
-#         #print(j,i)
-#         U = float(left +  (right - left) * (j + 0.5))
-#         V = float(bottom + (top - bottom) * ( i + 0.5))
-#         #print(U,V)
-#         matrix_2[j][i]=(U,V)
+# Vetor U será o vetor unitário do produto vetorial entre os vetores T e W
+vetorialTxW = numpy.cross(vetorT, vetorW)
+normaTxW    = normaVetor(vetorialTxW)
+vetorU      = vetorUnitario(vetorialTxW, normaTxW)
+
+# Vetor V será o resultado do produto vetorial entre os vetores W e U
+vetorV = numpy.cross(vetorW, vetorU)
+
+print(vetorU)
+print(vetorV)
+print(vetorW)
 
