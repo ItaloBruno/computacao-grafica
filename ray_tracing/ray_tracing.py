@@ -1,5 +1,6 @@
 import numpy
 from math import pow, sqrt
+import PIL
 
 # Valores dos lados do plano da imagem
 left      = -10
@@ -130,7 +131,61 @@ vetorV = calculaVetorV(vetorW, vetorU)
 
 matrizImagem = calculaValoresUV(matrizImagem, numColunas, numlinhas, left, right, top, bottom)
 
-casoOrtografico(matrizImagem, numColunas, numlinhas, vetorE, vetorU, vetorV, vetorW)
+# casoOrtografico(matrizImagem, numColunas, numlinhas, vetorE, vetorU, vetorV, vetorW)
 
-# casoObliquo(matrizImagem, numColunas, numlinhas, vetorE, vetorU, vetorV, vetorW, 4)
-print(matrizImagem)
+casoObliquo(matrizImagem, numColunas, numlinhas, vetorE, vetorU, vetorV, vetorW, distancia)
+
+# Caso Oblíquo e Ortogŕaficos concluídos
+
+""" 
+    Próximo passo é fazer o cálculo das funções implícitas
+    Para isso, precisamos calcular a variável t na função e + td 
+    onde e = origem, d = direção. 
+    Nesse caso, vamos explorar a interseção entre raio X esfera
+"""
+
+# Vetor que indica a posição do centro da esfera e seu respectivo raio
+centroEsfera = [0, 0, 0]
+raioEsfera = 0
+
+""" 
+    Para obter o valor de t, primeiro precisamos saber se raio toca ou não a esfera.
+    Primeiro calcula-se o delta, que é dado pela expressão abaixo:
+    ∆ = (2d · (e − c))**2 − 4(d · d)((e − c) · (e − c) − r**2 )
+
+    Se ∆ < 0, o raio não intercepta a esfera.
+    Se ∆ = 0, o raio toca exatamente um ponto na casca da esfera
+    Se ∆ > 0, existem duas soluções:
+    O raio entra na esfera
+    O raio sai da esfera
+"""
+
+def calculoDelta(matriz, nX, nY, centro, raio):
+    matrixResultante = matriz[:]
+    for i in range(nX):
+        for j in range(nY):
+            origem  = matrixResultante[i][j][0]
+            direcao = matrixResultante[i][j][1]
+
+            a = numpy.dot(direcao, direcao)
+
+            b = 2 * numpy.dot(direcao,(origem - centro))
+
+            c = numpy.dot((origem - centro), (origem - centro)) - raio**2
+            
+            # Cálculo Delta
+            delta = b**2 - (4 * a *c)
+
+            # Se o delta for maior que 0, o raio pode entrar ou sair da esfera
+            if(delta >= 0):
+                valorT1 = abs(- numpy.dot(direção, (origem - centro)) + sqrt(delta))
+                valorT2 = abs(- numpy.dot(direção, (origem - centro)) - sqrt(delta))
+                if (valorT1 >= valorT2)
+                    matrixResultante[i][j] = valorT1
+                else:
+                    matrixResultante[i][j] = valorT2
+
+    return matrixResultante
+
+imagemEsfera = calculoDelta(matrizImagem, numColunas, numlinhas, centroEsfera, raioEsfera)
+
