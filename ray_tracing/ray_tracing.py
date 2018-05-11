@@ -110,29 +110,27 @@ def Calculo_Delta(matriz_caso, matriz_img, colunas, linhas, esferas, luz, intens
                     t2 = abs(t2)
                     t  = min(t1, t2)
 
-                    ponto   = origem + (direcao * t)
-                    vetor_l = (luz - ponto)
-                    vetor_l = Calculo_Vetor_Unitario(vetor_l)
-                    vetor_n = (ponto - centro)
-                    vetor_n = Calculo_Vetor_Unitario(vetor_n)
-                    aux     = numpy.dot(vetor_n, vetor_l)
-                    
-                    lambert  = [0, 0, 0]
-                    lambert[0] = int(cor[0] * intensidade * max(0, aux))
-                    lambert[1] = int(cor[1] * intensidade * max(0, aux))
-                    lambert[2] = int(cor[2] * intensidade * max(0, aux))
-                    # print("""Valores l, n, aux, max
-                    # l = {}
-                    # n = {}
-                    # aux = {}
-                    # max(0, aux) = {}
-                    # lambert = {}
-
-                    # """.format(vetor_l, vetor_n, aux, max(0,aux), lambert))
                     if t < matriz_t[x][y]:
-                        matriz_t[x][y]   = t
-                        matriz_cor[x][y] = lambert
+                        matriz_t[x][y] = t
+                        ponto   = origem + (direcao * t)
+                        vetor_l = (luz - ponto)
+                        vetor_l = Calculo_Vetor_Unitario(vetor_l)
+                        vetor_n = (ponto - centro)
+                        vetor_n = Calculo_Vetor_Unitario(vetor_n)
+                        aux     = numpy.dot(vetor_n, vetor_l)
+                        matriz_cor[x][y] = Calculo_Lambert(cor, intensidade, aux)
     return matriz_cor
+
+def Calculo_Lambert(cor, intensidade, vetorial_n_l):
+    lambert = [0, 0, 0]
+    lambert[0] = int(cor[0] * intensidade * max(0, vetorial_n_l) + (cor_ambiente[0] * intensidade_ambiente))
+    lambert[1] = int(cor[1] * intensidade * max(0, vetorial_n_l) + (cor_ambiente[1] * intensidade_ambiente))
+    lambert[2] = int(cor[2] * intensidade * max(0, vetorial_n_l) + (cor_ambiente[2] * intensidade_ambiente))
+    return lambert
+
+# def Calculo_Blinn_Phong():
+#
+
 
 def Cria_Imagem(matriz_img, colunas, linhas):
     img = PilImage.new('RGB', (colunas, linhas))
@@ -151,11 +149,13 @@ right     =  13
 top       =  10
 bottom    = -10
 distancia =  4
+
 direcao_luz     = [-10, 20, 30]
 intensidade_luz = 1
 
-cor_ambiente = [255, 0, 255]
-intensidade_ambiente = []
+cor_ambiente = [0, 250, 0]
+intensidade_ambiente = 0.1
+
 # Declaração de vetores que serão usados
 vetor_a = [10, 10, 10]
 vetor_w = [0, 0, 0]
@@ -174,13 +174,13 @@ vetor_w = Calculo_Vetor_W(vetor_a)
 vetor_t = Calculo_Vetor_T(vetor_w)
 vetor_u = Calculo_Vetor_U(vetor_t, vetor_w)
 vetor_v = Calculo_Vetor_V(vetor_w, vetor_u)
-print("""Vetores A, W, T, U e V
-A = {}
-W = {}
-T = {}
-U = {} 
-V = {}
-""".format(vetor_a, vetor_w, vetor_t, vetor_u, vetor_v))
+# print("""Vetores A, W, T, U e V
+# A = {}
+# W = {}
+# T = {}
+# U = {}
+# V = {}
+# """.format(vetor_a, vetor_w, vetor_t, vetor_u, vetor_v))
 
 print("Calculando Valores u e v...")
 matriz_uv = Criar_Matriz(num_colunas, num_linhas, 0)
