@@ -85,7 +85,7 @@ def Caso_Obliquo(matriz_valores_uv, colunas, linhas, vet_a, vet_w, vet_u, vet_v,
             # print(matriz_result[x][y])
     return matriz_result
 
-def Calculo_Delta(matriz_caso, matriz_img, colunas, linhas, esferas, luz, intensidade):
+def Calculo_Delta(matriz_caso, matriz_img, colunas, linhas, esferas, luz, intensidade, potencia):
     matriz_t    = Criar_Matriz(colunas, linhas, 999999999999999999)
     matriz_cor  = matriz_img[:]
     for x in range(colunas):
@@ -118,7 +118,15 @@ def Calculo_Delta(matriz_caso, matriz_img, colunas, linhas, esferas, luz, intens
                         vetor_n = (ponto - centro)
                         vetor_n = Calculo_Vetor_Unitario(vetor_n)
                         aux     = numpy.dot(vetor_n, vetor_l)
-                        matriz_cor[x][y] = Calculo_Lambert(cor, intensidade, aux)
+                        lambert = Calculo_Lambert(cor, intensidade, aux)
+
+                        vetor_h = direcao - vetor_l
+                        vetor_h = Calculo_Vetor_Unitario(vetor_h)
+                        vetorial_n_h = numpy.dot(vetor_n, vetor_h)
+
+                        blinn_phong = Calculo_Blinn_Phong(lambert, cor_ambiente, intensidade_ambiente, vetorial_n_h, potencia)
+
+                        matriz_cor[x][y] = blinn_phong
     return matriz_cor
 
 def Calculo_Lambert(cor, intensidade, vetorial_n_l):
@@ -128,8 +136,12 @@ def Calculo_Lambert(cor, intensidade, vetorial_n_l):
     lambert[2] = int(cor[2] * intensidade * max(0, vetorial_n_l) + (cor_ambiente[2] * intensidade_ambiente))
     return lambert
 
-# def Calculo_Blinn_Phong():
-#
+def Calculo_Blinn_Phong(lambert, cor_amb, intensidade_amb, vetorial_n_h, potencia):
+    blinn_phong = [0, 0, 0]
+    blinn_phong[0] = int(lambert[0] + intensidade_amb * cor_amb[0] + max(0, vetorial_n_h) ** potencia)
+    blinn_phong[1] = int(lambert[1] + intensidade_amb * cor_amb[1] + max(0, vetorial_n_h) ** potencia)
+    blinn_phong[2] = int(lambert[2] + intensidade_amb * cor_amb[2] + max(0, vetorial_n_h) ** potencia)
+    return blinn_phong
 
 
 def Cria_Imagem(matriz_img, colunas, linhas):
@@ -155,6 +167,7 @@ intensidade_luz = 1
 
 cor_ambiente = [0, 250, 0]
 intensidade_ambiente = 0.1
+potencia_BP = 0.15
 
 # Declaração de vetores que serão usados
 vetor_a = [10, 10, 10]
@@ -164,7 +177,7 @@ vetor_v = [0, 0, 0]
 vetor_u = [0, 0, 0]
 num_colunas = 640
 num_linhas  = 480
-lista_esferas = [[[2, -15, 0], 2, [250, 250, 250]],
+lista_esferas = [[[2, -15, 0], 2, [250, 50, 100]],
                  [[10, -15, 0], 2, [50, 250, 150]]]
 
 # [4, -5, 0] [2, -5, 0] [2, -15, 0]
@@ -189,9 +202,9 @@ matriz_uv = Calculo_Valore_U_V(matriz_uv, num_colunas, num_linhas, left, right, 
 print("Calculando origem e direção do caso ortográfico...")
 matriz_caso_orto = Caso_Ortografico(matriz_uv, num_colunas, num_linhas, vetor_a, vetor_w, vetor_u, vetor_v)
 
-print("Calculando o delta...")
+print("Calculando o delta, lambert e blinn-pong...")
 matriz_imagem = Criar_Matriz(num_colunas, num_linhas, [0, 0, 0])
-matriz_imagem = Calculo_Delta(matriz_caso_orto, matriz_imagem, num_colunas, num_linhas, lista_esferas, direcao_luz, intensidade_luz)
+matriz_imagem = Calculo_Delta(matriz_caso_orto, matriz_imagem, num_colunas, num_linhas, lista_esferas, direcao_luz, intensidade_luz, potencia_BP)
 
 # print("Calculando origem e direção do caso oblíquo...")
 # matriz_caso_obliquo = Caso_Obliquo(matriz_uv, num_colunas, num_linhas, vetor_a, vetor_w, vetor_u, vetor_v, distancia)
