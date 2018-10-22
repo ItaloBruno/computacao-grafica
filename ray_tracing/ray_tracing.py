@@ -1,6 +1,8 @@
 import numpy
 from PIL import Image as PilImage
 
+#falta implementar o ray tracing para poligonos
+
 def Norma_Vetor(vetor):
     norma = 0
     for indice in range(len(vetor)):
